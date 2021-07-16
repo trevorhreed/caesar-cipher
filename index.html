@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en-US">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Caesar Cipher</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        box-sizing: border-box;
+      }
+      
+      body {
+        padding: 1em;
+        display: flex;
+        flex-direction: column;
+        font-family: Helvetica, Arial, sans-serif;
+        font-weight: 100;
+      }
+      
+      body,
+      input,
+      textarea {
+        background: #333;
+        color: #aaa;
+      }
+      
+      h1:first-child {
+        margin-top: 0;
+      }
+      
+      h1 {
+        font-weight: 100;
+      }
+      
+      section {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 0 0 2em;
+        box-sizing: border-box;
+      }
+      
+      label {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+      
+      .label {
+        font-size: 1.2em;
+        padding: .4em 0;
+      }
+      
+      textarea {
+        width: 100%;
+        flex: 1;
+        padding: 1em;
+        box-sizing: border-box;
+      }
+      
+      #output {
+        flex: 1;
+        box-sizing: border-box;
+      }
+      
+      #status {
+        font-size: 80%;
+        box-sizing: border-box;
+        padding: .2em 0;
+      }
+      
+      .toolbar {
+        display: flex;
+      }
+      
+      .fill {
+        flex: 1;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Caesar Cipher</h1>
+    <section>
+      <label>
+        <div class="label">Encoded</div>
+        <textarea id="encoded"></textarea>
+      </label>
+    </section>
+    <section>
+      <div class="label toolbar">
+        <span>Decoded</span>
+        <span class="fill"></span>
+        <span>Cipher Key:&nbsp;</span>
+        <select id="keys"></select>
+      </div>
+      <textarea id="decoded"></textarea>
+      <div id="status"></div>
+    </section>
+    <script src="words.js"></script>
+    <script>
+      const lowerAlpha = 'abcdefghijklmnopqrstuvwxyz'.split('')
+      const upperAlpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
+      const encodedEl = document.querySelector('#encoded')
+      const decodedEl = document.querySelector('#decoded')
+      const statusEl = document.querySelector('#status')
+      const cipherKeyEl = document.querySelector('#keys')
+
+      const getWordCount = text => {
+        const tokens = text.toLowerCase().split(/[^a-z]+/)
+        return tokens
+          .filter(x => words.includes(x))
+          .join('')
+          .length
+      }
+
+      const translate = (text, key) => {
+        let value = ''
+        for (let i = 0, l = text.length; i < l; i++) {
+          const c = text.charAt(i)
+          let index = lowerAlpha.findIndex(x => x === c)
+          if (index > -1) {
+            let newIndex = (index + key) % 26
+            value += lowerAlpha[newIndex]
+          } else {
+            index = upperAlpha.findIndex(x => x === c)
+            if (index > -1) {
+              let newIndex = (index + key) % 26
+              value += upperAlpha[newIndex]
+            } else {
+              value += c
+            }
+          }
+        }
+        return value
+      }
+
+      const keys = [...Array(26).keys()]
+      keys.forEach(key => {
+        const option = document.createElement('option')
+        option.textContent = key
+        cipherKeyEl.append(option)
+      })
+      const decipher = text => {
+        return keys
+          .map(key => {
+            const translation = translate(text, key)
+            return {
+              key,
+              translation,
+              wordCount: getWordCount(translation)
+            }
+          })
+          .reduce((a, c) => {
+            if (!a) return c
+            if (c.wordCount > a.wordCount) return c
+            return a
+          })
+      }
+
+      const encipher = () => {
+        encodedEl.value = translate(decodedEl.value, 26 - parseInt(cipherKeyEl.value))
+      }
+
+      encodedEl.addEventListener('input', e => {
+        const result = decipher(encodedEl.value)
+        decodedEl.value = result.translation
+        statusEl.textContent = `Detected word count length: ${result.wordCount}; cipher key: ${result.key}`
+      })
+
+      cipherKeyEl.addEventListener('input', encipher)
+      decodedEl.addEventListener('input', encipher)
+    </script>
+  </body>
+
+</html>
