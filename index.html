@@ -13,7 +13,7 @@
         height: 100%;
         box-sizing: border-box;
       }
-      
+
       body {
         padding: 1em;
         display: flex;
@@ -21,22 +21,22 @@
         font-family: Helvetica, Arial, sans-serif;
         font-weight: 100;
       }
-      
+
       body,
       input,
       textarea {
         background: #333;
         color: #aaa;
       }
-      
+
       h1:first-child {
         margin-top: 0;
       }
-      
+
       h1 {
         font-weight: 100;
       }
-      
+
       section {
         flex: 1;
         display: flex;
@@ -44,40 +44,40 @@
         padding: 0 0 2em;
         box-sizing: border-box;
       }
-      
+
       label {
         flex: 1;
         display: flex;
         flex-direction: column;
       }
-      
+
       .label {
         font-size: 1.2em;
         padding: .4em 0;
       }
-      
+
       textarea {
         width: 100%;
         flex: 1;
         padding: 1em;
         box-sizing: border-box;
       }
-      
+
       #output {
         flex: 1;
         box-sizing: border-box;
       }
-      
+
       #status {
         font-size: 80%;
         box-sizing: border-box;
         padding: .2em 0;
       }
-      
+
       .toolbar {
         display: flex;
       }
-      
+
       .fill {
         flex: 1;
       }
@@ -102,7 +102,7 @@
       <textarea id="decoded"></textarea>
       <div id="status"></div>
     </section>
-    <script src="words.js"></script>
+    <script src="words-hash.js"></script>
     <script>
       const lowerAlpha = 'abcdefghijklmnopqrstuvwxyz'.split('')
       const upperAlpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
@@ -114,7 +114,7 @@
       const getWordCount = text => {
         const tokens = text.toLowerCase().split(/[^a-z]+/)
         return tokens
-          .filter(x => words.includes(x))
+          .filter(x => !!words[x])
           .join('')
           .length
       }
