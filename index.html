@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Caesar Cipher!</title>
+    <title>Caesar Cipher</title>
     <style>
       html,
       body {
@@ -146,7 +146,7 @@
         option.textContent = key
         cipherKeyEl.append(option)
       })
-      const decipher = text => {
+      const detectCipher = text => {
         return keys
           .map(key => {
             const translation = translate(text, key)
@@ -163,18 +163,31 @@
           })
       }
 
+      const decipher = () => {
+        const result = detectCipher(encodedEl.value)
+        decodedEl.value = result.translation
+        statusEl.textContent = `Detected word count length: ${result.wordCount}; cipher key: ${result.key}`
+      }
+
       const encipher = () => {
         encodedEl.value = translate(decodedEl.value, 26 - parseInt(cipherKeyEl.value))
       }
 
-      encodedEl.addEventListener('input', e => {
-        const result = decipher(encodedEl.value)
-        decodedEl.value = result.translation
-        statusEl.textContent = `Detected word count length: ${result.wordCount}; cipher key: ${result.key}`
-      })
+      function debounce(func, timeout = 300) {
+        let timer
+        return (...args) => {
+          clearTimeout(timer)
+          timer = setTimeout(() => {
+            func.apply(this, args)
+          }, timeout)
+        }
+      }
 
-      cipherKeyEl.addEventListener('input', encipher)
-      decodedEl.addEventListener('input', encipher)
+      const debouncedDecipher = debounce(decipher)
+      const debouncedEncipher = debounce(encipher)
+      encodedEl.addEventListener('input', debouncedDecipher)
+      decodedEl.addEventListener('input', debouncedEncipher)
+      cipherKeyEl.addEventListener('input', debouncedEncipher)
     </script>
   </body>
 
